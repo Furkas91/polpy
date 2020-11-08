@@ -161,16 +161,21 @@ class Poly:
                 break
             j = 1
             for j in range(self.z):
-                if a.koefs[ka] == b.koefs[kb]*j%self.z:
+                if a.koefs[ka] == b.koefs[kb] * j % self.z:
                     break
                 elif j == self.z - 1:
-                    return (0,0)
+                    return (0, 0)
             kq = Poly({i: j})
-            #print(kq)
+            # print(kq)
             q += kq
-            a = a - b*kq
+            a = a - b * kq
         return (q, a)
 
+    def __floordiv__(self, other):
+        return self.__divmod__(other)[0]
+
+    def __mod__(self, other):
+        return self.__divmod__(other)[1]
 
     def ringz(self):
         if self.z:
@@ -190,21 +195,21 @@ class Poly:
 
         while len(b.koefs) > 0:
             a, b = b, divmod(a, b)[1]
-            #print(b)
+            # print(b)
         return a
 
     def gcdsup(self, other):
         if len(other.koefs) == 0:
-            return self, Poly({0:1}), Poly({})
+            return self, Poly({0: 1}), Poly({})
         else:
-            d, x, y = other.gcdsup(divmod(self, other)[1])
-        return d, y, x - y * divmod(self, other)[0]
+            d, x, y = other.gcdsup(self % other)
+        return d, y, x - y * (self // other)
 
     def gcdex(self, other):
         a = Poly(self.koefs.copy())
         b = Poly(other.koefs.copy())
         if len(b.koefs) == 0:
-            return a, Poly({0:1}), Poly({})
+            return a, Poly({0: 1}), Poly({})
         else:
-            d, x, y = b.gcdsup(divmod(a, b)[1])
-        return d, y, x - y * divmod(a, b)[0]
+            d, x, y = b.gcdsup(a % b)
+        return d, y, x - y * (a // b)
