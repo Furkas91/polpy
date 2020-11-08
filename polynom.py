@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Polynom:
-    z = np.NaN
+    z = 0
 
     def __init__(self, values):
         if isinstance(values, str):
@@ -62,7 +62,7 @@ class Polynom:
 
 
 class Poly:
-    z = np.NaN
+    z = 5
 
     def __init__(self, values):
         if isinstance(values, str):
@@ -113,6 +113,8 @@ class Poly:
                 values += f"{v}x{st}"
             else:
                 values += f"{abs(self.koefs[i])}"
+        if len(self.koefs) == 0:
+            values = "0"
         return values
 
     def __add__(self, other):
@@ -125,7 +127,7 @@ class Poly:
                 h[i] += other.koefs[i]
             else:
                 h[i] = other.koefs[i]
-        return Poly(h)
+        return Poly(h).ringz()
 
     def __sub__(self, other):
         # TODO: optimize that function, it has a lot of iterations
@@ -133,11 +135,7 @@ class Poly:
         for i in c.koefs:
             c.koefs[i] *= -1
         r = self + c
-        cr = self + c
-        for i in cr.koefs:
-            if r.koefs[i] == 0:
-                r.koefs.pop(i)
-        return r
+        return r.ringz()
 
     def __mul__(self, other):
         h = {}
@@ -147,4 +145,66 @@ class Poly:
                     h[i + j] += self.koefs[i] * other.koefs[j]
                 else:
                     h[i + j] = self.koefs[i] * other.koefs[j]
-        return Poly(h)
+        return Poly(h).ringz()
+
+    def __divmod__(self, other):
+        a = Poly(self.koefs.copy())
+        b = Poly(other.koefs.copy())
+        q = Poly({})
+        while True:
+            if len(a.koefs) == 0:
+                break
+            ka = sorted(a.koefs, reverse=True)[0]
+            kb = sorted(b.koefs, reverse=True)[0]
+            i = ka - kb
+            if i < 0:
+                break
+            j = 1
+            for j in range(self.z):
+                if a.koefs[ka] == b.koefs[kb]*j%self.z:
+                    break
+                elif j == self.z - 1:
+                    return (0,0)
+            kq = Poly({i: j})
+            #print(kq)
+            q += kq
+            a = a - b*kq
+        return (q, a)
+
+
+    def ringz(self):
+        if self.z:
+            cr = Poly(self.koefs.copy())
+            for i in cr.koefs:
+                self.koefs[i] %= self.z
+                if self.koefs[i] == 0:
+                    self.koefs.pop(i)
+        return self
+
+    def deg(self):
+        return sorted(self.koefs, reverse=True)[0]
+
+    def gcd(self, other):
+        a = Poly(self.koefs.copy())
+        b = Poly(other.koefs.copy())
+
+        while len(b.koefs) > 0:
+            a, b = b, divmod(a, b)[1]
+            #print(b)
+        return a
+
+    def gcdsup(self, other):
+        if len(other.koefs) == 0:
+            return self, Poly({0:1}), Poly({})
+        else:
+            d, x, y = other.gcdsup(divmod(self, other)[1])
+        return d, y, x - y * divmod(self, other)[0]
+
+    def gcdex(self, other):
+        a = Poly(self.koefs.copy())
+        b = Poly(other.koefs.copy())
+        if len(b.koefs) == 0:
+            return a, Poly({0:1}), Poly({})
+        else:
+            d, x, y = b.gcdsup(divmod(a, b)[1])
+        return d, y, x - y * divmod(a, b)[0]
