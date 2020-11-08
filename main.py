@@ -1,11 +1,14 @@
-from polynom import Polynom
+from polynom import Polynom, Poly
+
 
 def main():
-    s = Polynom(str(input()))
-    p = Polynom(str(input()))
-    print(p*s)
+    p = Poly(str(input()))
+    s = Poly(str(input()))
+
+    #print(s)
     print(p+s)
     print(p-s)
+    print(p*s)
 
 if __name__ == '__main__':
     main()
