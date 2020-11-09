@@ -209,3 +209,7 @@ class Poly:
         a = Poly(self.koefs.copy())
         b = Poly(other.koefs.copy())
         return a.gcdsup(b)
+
+    def derivative(self):
+        # TODO: write an algorithm for taking the derivative
+        pass
