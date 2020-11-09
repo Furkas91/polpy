@@ -176,6 +176,10 @@ class Poly:
     def __mod__(self, other):
         return self.__divmod__(other)[1]
 
+    def __pow__(self):
+        # TODO: write an algorithm for exponentiation
+        pass
+
     def ringz(self):
         if self.z:
             cr = Poly(self.koefs.copy())
@@ -211,5 +215,8 @@ class Poly:
         return a.gcdsup(b)
 
     def derivative(self):
-        # TODO: write an algorithm for taking the derivative
-        pass
+        h = {}
+        for i in self.koefs:
+            if i > 0:
+                h[i-1] = self.koefs[i]*i
+        return Poly(h).ringz()
