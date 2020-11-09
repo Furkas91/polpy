@@ -24,6 +24,20 @@ class Factors:
             fts += f"({mul[0].__str__()}){mul[1]}"
         return fts
 
+    def __add__(self, other):
+        return self.expand()+other.expand()
+
+    def __sub__(self, other):
+        return self.expand()-other.expand()
+
+    def __mul__(self, other):
+        # TODO: write a function that performs multiplication without opening parentheses
+        pass
+
+    def __divmod__(self, other):
+        # TODO: write a function that performs division without opening parentheses, if possible
+        pass
+
     def expand(self):
         p = Poly({0: 1})
         for mul in self.multipliers:
@@ -33,3 +47,4 @@ class Factors:
             else:
                 p *= mul[0]
         return p
+

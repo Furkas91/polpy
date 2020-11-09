@@ -130,7 +130,6 @@ class Poly:
         return Poly(h).ringz()
 
     def __sub__(self, other):
-        # TODO: optimize that function, it has a lot of iterations
         c = Poly(other.koefs.copy())
         for i in c.koefs:
             c.koefs[i] *= -1
