@@ -1,18 +1,18 @@
 from polynom import Poly
 
 
-class Factors():
+class Factors:
     def __init__(self, values):
-        #print(values)
+        # print(values)
         if isinstance(values, str):
             self.multipliers = []
             values = values[1:].split('(')
-            #print(values)
+            # print(values)
             for val in values:
                 val = val.split(')')
-                #print(val)
+                # print(val)
                 if val[1]:
-                    self.multipliers.append((Poly(val[0]),val[1]))
+                    self.multipliers.append((Poly(val[0]), val[1]))
                 else:
                     self.multipliers.append((Poly(val[0]), ""))
         else:

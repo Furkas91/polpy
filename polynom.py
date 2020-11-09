@@ -164,12 +164,12 @@ class Poly:
                 if a.koefs[ka] == b.koefs[kb] * j % self.z:
                     break
                 elif j == self.z - 1:
-                    return (0, 0)
+                    return 0, 0
             kq = Poly({i: j})
             # print(kq)
             q += kq
             a = a - b * kq
-        return (q, a)
+        return q, a
 
     def __floordiv__(self, other):
         return self.__divmod__(other)[0]
@@ -205,11 +205,8 @@ class Poly:
             d, x, y = other.gcdsup(self % other)
         return d, y, x - y * (self // other)
 
+    # noinspection PyTypeChecker
     def gcdex(self, other):
         a = Poly(self.koefs.copy())
         b = Poly(other.koefs.copy())
-        if len(b.koefs) == 0:
-            return a, Poly({0: 1}), Poly({})
-        else:
-            d, x, y = b.gcdsup(a % b)
-        return d, y, x - y * (a // b)
+        return a.gcdsup(b)
