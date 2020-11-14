@@ -1,13 +1,13 @@
-from factors import Factors
+#from factors import Factors
 from polynom import Polynom, Poly
 
 
 def main():
-    p = Factors(str(input()))
+    p = Poly(str(input()))
     #s = Poly(str(input()))
-    print(p.expand().derivative())
+    #print(p.expand().derivative())
     #print(s)
-    #print(p+s)
+    print(p.squarefree())
     #print(p-s)
     #print(p*s)
     #print(p.gcd(s))

@@ -1,8 +1,6 @@
-from polynom import Poly
-
-
 class Factors:
     def __init__(self, values):
+        from polynom import Poly
         # print(values)
         if isinstance(values, str):
             self.multipliers = []
@@ -39,6 +37,7 @@ class Factors:
         pass
 
     def expand(self):
+        from polynom import Poly
         p = Poly({0: 1})
         for mul in self.multipliers:
             if mul[1].replace("^", ""):

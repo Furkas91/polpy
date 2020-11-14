@@ -62,7 +62,7 @@ class Polynom:
 
 
 class Poly:
-    z = 5
+    z = 7
 
     def __init__(self, values):
         if isinstance(values, str):
@@ -153,28 +153,39 @@ class Poly:
         return Poly(h).ringz()
 
     def __divmod__(self, other):
-        a = Poly(self.koefs.copy())
-        b = Poly(other.koefs.copy())
+        # division function that only works on a prime remainder ring
+        # initiate internal variables
+        r = Poly(self.koefs.copy())
+        d = Poly(other.koefs.copy())
         q = Poly({})
+        # main cycle division
         while True:
-            if len(a.koefs) == 0:
+            # if r=0, then division finished with reminder = 0
+            if r == 0:
                 break
-            ka = sorted(a.koefs, reverse=True)[0]
-            kb = sorted(b.koefs, reverse=True)[0]
-            i = ka - kb
+            # check degrees reminder's and divider's
+            kr = r.deg()
+            kd = d.deg()
+            i = kr - kd
             if i < 0:
                 break
             j = 1
+            # find suitable multiplier for this step
             for j in range(self.z):
-                if a.koefs[ka] == b.koefs[kb] * j % self.z:
+                if r.koefs[kr] == d.koefs[kd] * j % self.z:
                     break
+                # i don't know what that condition mean
                 elif j == self.z - 1:
-                    return 0, 0
+                    print("attention")
+                    return Poly({0: 0}), Poly({0: 0})
+            # creating monom from quotient
             kq = Poly({i: j})
-            # print(kq)
+            #print(kq)
+            # add monom to quotient
             q += kq
-            a = a - b * kq
-        return q, a
+            # computing the reminder
+            r = r - d * kq
+        return q, r
 
     def __floordiv__(self, other):
         return self.__divmod__(other)[0]
@@ -209,12 +220,13 @@ class Poly:
 
     def gcdsup(self, other):
         if other == 0:
+            print(other)
             return self, Poly({0: 1}), Poly({})
         else:
+            print(f"self {self}\n other {other} \n mod {self % other}")
             d, x, y = other.gcdsup(self % other)
-        return d, y, x - y * (self // other)
+            return d, y, x - y * (self // other)
 
-    # noinspection PyTypeChecker
     def gcdex(self, other):
         a = Poly(self.koefs.copy())
         b = Poly(other.koefs.copy())
@@ -229,4 +241,17 @@ class Poly:
 
     def squarefree(self):
         # TODO: write to basic square free algorithm
-        pass
+        from factors import Factors
+        p = Poly(self.koefs.copy())
+        f = Factors([])
+        deg = 1
+        while p.deg() != 0:
+            g = p.derivative()
+            gx = p.gcdex(g)[0]
+            tx = p // gx
+            fx = gx.gcdex(tx)[0]
+            mon = tx // fx
+            f.multipliers.append((mon, deg))
+            p = gx
+            deg += 1
+        return f
