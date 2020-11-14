@@ -117,6 +117,12 @@ class Poly:
             values = "0"
         return values
 
+    def __eq__(self, other):
+        if isinstance(other, Poly):
+            return len(self.koefs) == len(other.koefs)
+        elif isinstance(other, int):
+            return len(self.koefs) == other
+
     def __add__(self, other):
         h = {}
         # TODO: add optimized queue
@@ -202,7 +208,7 @@ class Poly:
         return a
 
     def gcdsup(self, other):
-        if len(other.koefs) == 0:
+        if other == 0:
             return self, Poly({0: 1}), Poly({})
         else:
             d, x, y = other.gcdsup(self % other)
@@ -218,5 +224,9 @@ class Poly:
         h = {}
         for i in self.koefs:
             if i > 0:
-                h[i-1] = self.koefs[i]*i
+                h[i - 1] = self.koefs[i] * i
         return Poly(h).ringz()
+
+    def squarefree(self):
+        # TODO: write to basic square free algorithm
+        pass
