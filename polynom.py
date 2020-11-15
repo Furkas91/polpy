@@ -62,13 +62,16 @@ class Polynom:
 
 
 class Poly:
-    z = 7
+    z = 5
 
     def __init__(self, values):
         if isinstance(values, str):
             values = values.replace(' ', '')
             values = values.replace('-', "+-")
+            values = values.replace("-x", "-1x")
+            # print(values)
             mas = values.split('+')
+            # print(mas)
             self.koefs = {}
             for k in mas:
                 if 'x' in k:
@@ -84,6 +87,7 @@ class Poly:
                 else:
                     i = 0
                     v = int(k)
+                # print(f"{i}x^{v}")
                 if self.koefs.get(i):
                     self.koefs[i] += v
                 else:
@@ -201,7 +205,9 @@ class Poly:
         if self.z:
             cr = Poly(self.koefs.copy())
             for i in cr.koefs:
+                #print(self.koefs[i])
                 self.koefs[i] %= self.z
+                #print(f"= {self.koefs[i]} mod {self.z}")
                 if self.koefs[i] == 0:
                     self.koefs.pop(i)
         return self
@@ -209,21 +215,24 @@ class Poly:
     def deg(self):
         return sorted(self.koefs, reverse=True)[0]
 
+    def normalize(self):
+        pass
+
     def gcd(self, other):
         a = Poly(self.koefs.copy())
         b = Poly(other.koefs.copy())
 
         while len(b.koefs) > 0:
-            a, b = b, divmod(a, b)[1]
-            # print(b)
+            a, b = b, a % b
+            #print(f"a = {a}\nb = {b}")
         return a
 
     def gcdsup(self, other):
         if other == 0:
-            print(other)
+            #print(other)
             return self, Poly({0: 1}), Poly({})
         else:
-            print(f"self {self}\n other {other} \n mod {self % other}")
+            #print(f"self {self}\n other {other} \n mod {self % other}")
             d, x, y = other.gcdsup(self % other)
             return d, y, x - y * (self // other)
 
@@ -247,11 +256,20 @@ class Poly:
         deg = 1
         while p.deg() != 0:
             g = p.derivative()
-            gx = p.gcdex(g)[0]
+            print(f" g = {g}")
+            gx = p.gcd(g)
+            print(f" gx = {gx}")
             tx = p // gx
-            fx = gx.gcdex(tx)[0]
-            mon = tx // fx
-            f.multipliers.append((mon, deg))
+            print(f" tx = {tx}")
+            fx = gx.gcd(tx)
+            print(f" fx = {fx}")
+            if fx.deg() > 0:
+                mon = tx // fx
+            else:
+                mon = tx
+            print(f" mon = {mon}")
+            f.multipliers.append((mon, f"^{deg}"))
             p = gx
+            print(deg)
             deg += 1
         return f
