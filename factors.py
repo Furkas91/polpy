@@ -46,4 +46,3 @@ class Factors:
             else:
                 p *= mul[0]
         return p
-

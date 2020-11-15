@@ -62,7 +62,7 @@ class Polynom:
 
 
 class Poly:
-    z = 5
+    z = 7
 
     def __init__(self, values):
         if isinstance(values, str):
@@ -184,7 +184,7 @@ class Poly:
                     return Poly({0: 0}), Poly({0: 0})
             # creating monom from quotient
             kq = Poly({i: j})
-            #print(kq)
+            # print(kq)
             # add monom to quotient
             q += kq
             # computing the reminder
@@ -205,9 +205,9 @@ class Poly:
         if self.z:
             cr = Poly(self.koefs.copy())
             for i in cr.koefs:
-                #print(self.koefs[i])
+                # print(self.koefs[i])
                 self.koefs[i] %= self.z
-                #print(f"= {self.koefs[i]} mod {self.z}")
+                # print(f"= {self.koefs[i]} mod {self.z}")
                 if self.koefs[i] == 0:
                     self.koefs.pop(i)
         return self
@@ -224,15 +224,15 @@ class Poly:
 
         while len(b.koefs) > 0:
             a, b = b, a % b
-            #print(f"a = {a}\nb = {b}")
+            print(f"a = {a}\nb = {b}")
         return a
 
     def gcdsup(self, other):
         if other == 0:
-            #print(other)
+            # print(other)
             return self, Poly({0: 1}), Poly({})
         else:
-            #print(f"self {self}\n other {other} \n mod {self % other}")
+            # print(f"self {self}\n other {other} \n mod {self % other}")
             d, x, y = other.gcdsup(self % other)
             return d, y, x - y * (self // other)
 
@@ -273,3 +273,21 @@ class Poly:
             print(deg)
             deg += 1
         return f
+
+    def to_nparray(self, n):
+        k = np.zeros(n, np.int32)
+        # print(self.koefs)
+        for i in self.koefs:
+            k[i] = self.koefs[i]
+        return k
+
+    def berlekamp(self):
+        from factors import Factors
+        m = []
+        for i in range(self.deg()):
+            h = Poly({i*self.z: 1})
+            r = h % self
+            #print(f"{h}/{self}={r}")
+            print(r.to_nparray(self.deg()))
+            m.append(r.to_nparray(self.deg()))
+        print(np.asarray(m).transpose())

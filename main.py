@@ -1,12 +1,18 @@
-#from factors import Factors
+from factors import Factors
 from polynom import Polynom, Poly
 
 def main():
     p = Poly(str(input()))
+    p.berlekamp()
     #s = Poly(str(input()))
+    #Poly.z = 7
     #print(p.expand().derivative())
     #print(s)
-    print(p.squarefree())
+    #p.ringz()
+    #print(p)
+    #s = p.squarefree()
+    #print(s)
+    #print(s.expand())
     #print(p-s)
     #print(p*s)
     #print(p.gcd(s))
