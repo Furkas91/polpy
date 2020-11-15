@@ -61,6 +61,14 @@ class Polynom:
         return Polynom(mul)
 
 
+def to_hash(a):
+    h = {}
+    for i in range(len(a)):
+        if a[i] != 0:
+            h[len(a)-i-1] = a[i]
+    return h
+
+
 class Poly:
     z = 7
 
@@ -283,11 +291,31 @@ class Poly:
 
     def berlekamp(self):
         from factors import Factors
+        f = Factors([])
         m = []
         for i in range(self.deg()):
-            h = Poly({i*self.z: 1})
+            h = Poly({i * self.z: 1})
             r = h % self
-            #print(f"{h}/{self}={r}")
-            print(r.to_nparray(self.deg()))
+            # print(f"{h}/{self}={r}")
+            #print(r.to_nparray(self.deg()))
             m.append(r.to_nparray(self.deg()))
-        print(np.asarray(m).transpose())
+        Q = np.asarray(m).transpose()[::-1]
+        for i in range(len(Q)):
+            Q[i] = Q[i][::-1]
+        A = (Q - np.asarray([[1, 0, 0, 0],
+                           [0, 1, 0, 0],
+                           [0, 0, 1, 0],
+                           [0, 0, 0, 1]]))%self.z
+        print(Q)
+        print(A)
+        # TODO: Add kernel function
+        # a = kernel(A)
+        a = [1, 5, 3, 0]
+        g = Poly(to_hash(a)).ringz()
+        print(f"g = {g}")
+        for i in range(self.z):
+            d = self.gcdex(g - Poly({0: i}))[0]
+            print(f"d{i} = {d}")
+            if d.koefs != {0: 1}:
+                f.multipliers.append((d, ""))
+        print(f)

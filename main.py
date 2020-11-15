@@ -2,7 +2,7 @@ from factors import Factors
 from polynom import Polynom, Poly
 
 def main():
-    p = Poly(str(input()))
+    p = Poly("x^4+3x-2")
     p.berlekamp()
     #s = Poly(str(input()))
     #Poly.z = 7
