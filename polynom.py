@@ -65,7 +65,7 @@ def to_hash(a):
     h = {}
     for i in range(len(a)):
         if a[i] != 0:
-            h[len(a)-i-1] = a[i]
+            h[len(a) - i - 1] = a[i]
     return h
 
 
@@ -297,15 +297,15 @@ class Poly:
             h = Poly({i * self.z: 1})
             r = h % self
             # print(f"{h}/{self}={r}")
-            #print(r.to_nparray(self.deg()))
+            # print(r.to_nparray(self.deg()))
             m.append(r.to_nparray(self.deg()))
         Q = np.asarray(m).transpose()[::-1]
         for i in range(len(Q)):
             Q[i] = Q[i][::-1]
         A = (Q - np.asarray([[1, 0, 0, 0],
-                           [0, 1, 0, 0],
-                           [0, 0, 1, 0],
-                           [0, 0, 0, 1]]))%self.z
+                             [0, 1, 0, 0],
+                             [0, 0, 1, 0],
+                             [0, 0, 0, 1]])) % self.z
         print(Q)
         print(A)
         # TODO: Add kernel function
@@ -319,3 +319,12 @@ class Poly:
             if d.koefs != {0: 1}:
                 f.multipliers.append((d, ""))
         print(f)
+        return f
+
+    def henzel_lifting(self, k=2):
+        f = self.berlekamp()
+        g1 = f.multipliers[0][0]
+        h1 = f.multipliers[1][0]
+        for t in range(k - 1):
+            # TODO: finish that function
+            pass
