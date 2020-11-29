@@ -30,12 +30,12 @@ def get_solution(ker_matrix, z=7):
     return monic_pol
 
 
-def kernel():
-    z = 7
-    a = np.asarray([[-1, -1, 2, 0],
-                    [1, 4, 0, 0],
-                    [-1, 1, 1, 0],
-                    [-4, 3, 1, 0]])
+def kernel(matrix, z=7):
+    # z = 7
+    matrix = np.asarray([[-1, -1, 2, 0],
+                         [1, 4, 0, 0],
+                         [-1, 1, 1, 0],
+                         [-4, -4, 1, 0]])
 
     matrix_t = matrix.transpose()
     u_matrix = np.eye(len(matrix_t))
