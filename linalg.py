@@ -12,7 +12,6 @@ def psevdodivarr(a, b, z):
         i = psevdodiv(i, b, z)
     return a
 
-
 def kernel():
     z = 7
     a = np.asarray([[-1, -1, 2, 0],
@@ -20,17 +19,41 @@ def kernel():
                     [-1, 1, 1, 0],
                     [-4, 3, 1, 0]])
 
-    for i in range(len(a)):
-        for k in range(len(a)):
-            if i != k:
-                for j in range(0, z):
-                    if (a[k][i] + a[i][i] * j) % z == 0:
-                        x = a[k]
-                        a[k] = (a[k] + a[i] * j) % z
-                        print(f"{a[k]} = {x} + {a[i]}*{j}%{z}")
-                        break
+    matrix_t = matrix.transpose()
+    u_matrix = np.eye(len(matrix_t))
+    ker_matrix = np.concatenate((matrix_t, u_matrix), axis=1)
+    ker_matrix = ker_matrix % z
+    ind_row = 0
 
-    print(a)
+    for col in range(len(matrix[0])):
+        # print('Step for {} column'.format(col))
+        for row in range(ind_row, len(matrix)):
+            # Pivoting
+            if ker_matrix[row][col]:
+                ker_matrix[[ind_row, row]] = ker_matrix[[row, ind_row]]
+                break
+
+        for row in range(ind_row + 1, len(matrix)):
+            # ax + b = 0 mod(z)
+            # ax = -b mod(z)
+            b = (-1) * ker_matrix[row][col]
+
+            # x = -b/a mod(z)
+            x = psevdodiv(b % z, ker_matrix[ind_row][col], z)
+
+            # b = ax + b
+            ker_matrix[row] += x * ker_matrix[ind_row]
+
+        # ker_matrix %= z
+        # print('Matrix after {} step'.format(col))
+        # print(ker_matrix)
+        ind_row += 1
+
+    # print('__________________')
+    # print('Final matrix')
+    ker_matrix %= z
+    # print(ker_matrix)
+    return ker_matrix
 
 
 def ToReducedRowEchelonForm(M):
@@ -56,15 +79,14 @@ def ToReducedRowEchelonForm(M):
         for i in range(rowCount):
             if i != r:
                 lv = M[i][lead]
-                M[i] = (M[i]-M[r]*lv) % 7
+                M[i] = (M[i] - M[r] * lv) % 7
         lead += 1
 
 
-mtx = np.asarray([
-                    [1, 1, 3, 3],
-                    [0, 2, 1, 6],
-                    [0, 0, 5, 1],
-                    [0, 2, 6, 0]])
+mtx = np.asarray([[1, 1, 3, 3],
+                  [0, 2, 1, 6],
+                  [0, 0, 5, 1],
+                  [0, 2, 6, 0]])
 
 ToReducedRowEchelonForm(mtx)
 
