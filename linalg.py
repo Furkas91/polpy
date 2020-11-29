@@ -12,6 +12,17 @@ def psevdodivarr(a, b, z):
         i = psevdodiv(i, b, z)
     return a
 
+
+def get_solution(ker_matrix, z=7):
+    zero = ker_matrix[np.all(ker_matrix[:, :len(ker_matrix/2)] == 0, axis=1)]
+    kernel = zero[:, len(ker_matrix/2):len(ker_matrix[0])]
+    solution = kernel[kernel[:, 0] != 0]
+    b = solution[0][0]
+    x = psevdodiv(1, b, z)
+    monic_pol = (solution[0] * x) % z
+    # print(monic_pol)
+    return monic_pol
+
 def kernel():
     z = 7
     a = np.asarray([[-1, -1, 2, 0],
