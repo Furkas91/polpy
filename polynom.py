@@ -1,5 +1,5 @@
 import numpy as np
-
+import linalg as la
 
 class Polynom:
     z = 0
@@ -302,15 +302,20 @@ class Poly:
         Q = np.asarray(m).transpose()[::-1]
         for i in range(len(Q)):
             Q[i] = Q[i][::-1]
-        A = (Q - np.asarray([[1, 0, 0, 0],
-                             [0, 1, 0, 0],
-                             [0, 0, 1, 0],
-                             [0, 0, 0, 1]])) % self.z
-        print(Q)
-        print(A)
+        # A = (Q - np.asarray([[1, 0, 0, 0],
+        #                      [0, 1, 0, 0],
+        #                      [0, 0, 1, 0],
+        #                      [0, 0, 0, 1]])) % self.z
+
+        A = []
+        for i in range(len(Q)):
+            print("A append: ", Q[i])
+            A.append(Q[i] % self.z)
+            A[i][i] -= 1
+
         # TODO: Add kernel function
-        # a = kernel(A)
-        a = [1, 5, 3, 0]
+        a = la.kernel()
+        # a = [1, 5, 3, 0]
         g = Poly(to_hash(a)).ringz()
         print(f"g = {g}")
         for i in range(self.z):

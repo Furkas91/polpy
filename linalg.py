@@ -29,6 +29,7 @@ def get_solution(ker_matrix, z=7):
     # print(monic_pol)
     return monic_pol
 
+
 def kernel():
     z = 7
     a = np.asarray([[-1, -1, 2, 0],
