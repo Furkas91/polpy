@@ -13,6 +13,12 @@ def psevdodivarr(a, b, z):
     return a
 
 
+def check_ker_matrix(matrix, kernel, z):
+    mul = np.matmul(matrix, kernel.transpose()) % z
+    # return mul
+    return np.all(mul == 0)
+
+
 def get_solution(ker_matrix, z=7):
     zero = ker_matrix[np.all(ker_matrix[:, :len(ker_matrix/2)] == 0, axis=1)]
     kernel = zero[:, len(ker_matrix/2):len(ker_matrix[0])]
