@@ -1,4 +1,4 @@
-from factors import Factors
+# from factors import Factors
 from polynom import Polynom, Poly
 
 def main():
