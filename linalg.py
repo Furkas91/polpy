@@ -19,23 +19,23 @@ def check_ker_matrix(matrix, kernel, z):
     return np.all(mul == 0)
 
 
-# def get_solution(ker_matrix, z=7):
-#     zero = ker_matrix[np.all(ker_matrix[:, :len(ker_matrix/2)] == 0, axis=1)]
-#     kernel = zero[:, len(ker_matrix/2):len(ker_matrix[0])]
-#     solution = kernel[kernel[:, 0] != 0]
-#     b = solution[0][0]
-#     x = psevdodiv(1, b, z)
-#     monic_pol = (solution[0] * x) % z
-#     # print(monic_pol)
-#     return monic_pol
+def get_solution(ker_matrix, z=7):
+    zero = ker_matrix[np.all(ker_matrix[:, :len(ker_matrix[0])/2] == 0, axis=1)]
+    kernel = zero[:, len(ker_matrix/2):len(ker_matrix[0])]
+    solution = kernel[kernel[:, 0] != 0]
+    b = solution[0][0]
+    x = psevdodiv(1, b, z)
+    monic_pol = (solution[0] * x) % z
+    # print(monic_pol)
+    return monic_pol
 
 
 def kernel(matrix, z=7):
     # z = 7
-    matrix = np.asarray([[-1, -1, 2, 0],
-                         [1, 4, 0, 0],
-                         [-1, 1, 1, 0],
-                         [-4, -4, 1, 0]])
+    # matrix = np.asarray([[-1, -1, 2, 0],
+    #                      [1, 4, 0, 0],
+    #                      [-1, 1, 1, 0],
+    #                      [-4, -4, 1, 0]])
 
     matrix_t = matrix.transpose()
     u_matrix = np.eye(len(matrix_t))
@@ -71,16 +71,7 @@ def kernel(matrix, z=7):
     # print('Final matrix')
     ker_matrix %= z
     # print(ker_matrix)
-
-    zero = ker_matrix[np.all(ker_matrix[:, :len(matrix)] == 0, axis=1)]
-    kernel = zero[:, len(matrix):len(ker_matrix[0])]
-    solution = kernel[kernel[:, 0] != 0]
-    b = solution[0][0]
-    x = psevdodiv(1, b, z)
-    monic_pol = (solution[0] * x) % z
-    print(monic_pol)
-
-    return monic_pol
+    return ker_matrix
 
 
 def ToReducedRowEchelonForm(M):
