@@ -19,15 +19,15 @@ def check_ker_matrix(matrix, kernel, z):
     return np.all(mul == 0)
 
 
-def get_solution(ker_matrix, z=7):
-    zero = ker_matrix[np.all(ker_matrix[:, :len(ker_matrix/2)] == 0, axis=1)]
-    kernel = zero[:, len(ker_matrix/2):len(ker_matrix[0])]
-    solution = kernel[kernel[:, 0] != 0]
-    b = solution[0][0]
-    x = psevdodiv(1, b, z)
-    monic_pol = (solution[0] * x) % z
-    # print(monic_pol)
-    return monic_pol
+# def get_solution(ker_matrix, z=7):
+#     zero = ker_matrix[np.all(ker_matrix[:, :len(ker_matrix/2)] == 0, axis=1)]
+#     kernel = zero[:, len(ker_matrix/2):len(ker_matrix[0])]
+#     solution = kernel[kernel[:, 0] != 0]
+#     b = solution[0][0]
+#     x = psevdodiv(1, b, z)
+#     monic_pol = (solution[0] * x) % z
+#     # print(monic_pol)
+#     return monic_pol
 
 
 def kernel(matrix, z=7):
@@ -71,7 +71,16 @@ def kernel(matrix, z=7):
     # print('Final matrix')
     ker_matrix %= z
     # print(ker_matrix)
-    return ker_matrix
+
+    zero = ker_matrix[np.all(ker_matrix[:, :len(matrix)] == 0, axis=1)]
+    kernel = zero[:, len(matrix):len(ker_matrix[0])]
+    solution = kernel[kernel[:, 0] != 0]
+    b = solution[0][0]
+    x = psevdodiv(1, b, z)
+    monic_pol = (solution[0] * x) % z
+    print(monic_pol)
+
+    return monic_pol
 
 
 def ToReducedRowEchelonForm(M):
