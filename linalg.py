@@ -20,7 +20,7 @@ def check_ker_matrix(matrix, kernel, z):
 
 
 def get_solution(ker_matrix, z=7):
-    zero = ker_matrix[np.all(ker_matrix[:, :len(ker_matrix/2)] == 0, axis=1)]
+    zero = ker_matrix[np.all(ker_matrix[:, :len(ker_matrix[0])/2] == 0, axis=1)]
     kernel = zero[:, len(ker_matrix/2):len(ker_matrix[0])]
     solution = kernel[kernel[:, 0] != 0]
     b = solution[0][0]
@@ -32,10 +32,10 @@ def get_solution(ker_matrix, z=7):
 
 def kernel(matrix, z=7):
     # z = 7
-    matrix = np.asarray([[-1, -1, 2, 0],
-                         [1, 4, 0, 0],
-                         [-1, 1, 1, 0],
-                         [-4, -4, 1, 0]])
+    # matrix = np.asarray([[-1, -1, 2, 0],
+    #                      [1, 4, 0, 0],
+    #                      [-1, 1, 1, 0],
+    #                      [-4, -4, 1, 0]])
 
     matrix_t = matrix.transpose()
     u_matrix = np.eye(len(matrix_t))

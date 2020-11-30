@@ -312,9 +312,9 @@ class Poly:
             print("A append: ", Q[i])
             A.append(Q[i] % self.z)
             A[i][i] -= 1
-
+        A = np.asarray(A)
         # TODO: Add kernel function
-        a = la.kernel()
+        a = la.get_solution(A)
         # a = [1, 5, 3, 0]
         g = Poly(to_hash(a)).ringz()
         print(f"g = {g}")
