@@ -9,7 +9,9 @@ class TestPolynom(unittest.TestCase):
         #self.polynom = Poly("x^3+x^2+x+5")
         self.otherpolynom = Poly("x^2-2x-5")
         # for berlikamp:
-        self.polynom = Poly("x^2-4x+2")  # x^4+3x-2
+        #self.polynom = Poly("x^2-4x+2")  # x^4+3x-2
+        # for kroneker:
+        self.polynom = Poly("x^2-3x+2")
 
     def test_add(self):
         result = self.polynom.__add__(self.otherpolynom).__str__()
@@ -34,6 +36,10 @@ class TestPolynom(unittest.TestCase):
     def test_berlekamp(self):
         result = self.polynom.berlekamp().__str__()
         self.assertEqual(result, "(x-2)(x-2)")  # "(x^2+6x+2)(x^2+x+6)"
+
+    def test_kroneker(self):
+        result = self.polynom.kroneker().__str__()
+        self.assertEqual(result, "(x-1)(x-2)")
 
 
 if __name__ == "__main__":

@@ -1,8 +1,10 @@
 import numpy as np
 import linalg as la
+import itertools
+
 
 class Polynom:
-    z = 0
+    z = 7
 
     def __init__(self, values):
         if isinstance(values, str):
@@ -333,3 +335,57 @@ class Poly:
         for t in range(k - 1):
             # TODO: finish that function
             pass
+
+    def cartesian_product_itertools(self, arrays):
+        return np.array(list(itertools.product(*arrays)))
+
+    def devisors(self, N):
+        D = np.array([-1, 1])
+        d = 2
+        while (d * d <= np.abs(N)):
+            if N % d == 0:
+                D = np.append(np.append(D, d), -d)
+                d_new = N // d
+                if d_new != d:
+                    D = np.append(np.append(D, d_new), -d_new)
+            d += 1
+
+        D = np.append(np.append(D, N), -N)
+        return np.unique(D)
+
+    def kroneker(self):
+        result_file = open('result.txt', 'w')
+        result_set = set()
+        result = np.array([])
+        coefs = list(self.koefs)
+        print("coefs is: ", coefs)
+        p = np.poly1d(coefs)
+        p0 = p(0)
+        flag = False
+        for i in range((len(coefs) - 1) // 2):
+            if p(i) == 0:
+                result_set.add(str(np.array([1, -i])))
+
+        if len(result_set) == 0:
+            U = self.devisors(p0).copy()
+            for i in range(1, (len(coefs) - 1) // 2 + 1):
+                M = self.devisors(p(i)).copy()
+                U1 = np.array([])
+                if i == 1:
+                    U = self.cartesian_product_itertools([U, M])
+                else:
+                    U1 = self.cartesian_product_itertools([U, M])
+                    U_new = np.array([np.append(U1[0][0], U1[0][1])])
+                    for u in range(1, len(U1)):
+                        new_u = np.array(np.append(U1[u][0], U1[u][1]))
+                        U_new = np.append(U_new, [new_u], axis=0)
+                    U = U_new.copy()
+                for u in U:
+                    vars = np.array(list(itertools.permutations(u)))
+                    for coefs_u in vars:
+                        res = np.polydiv(coefs, coefs_u)[1][0]
+                        if res == 0.0:
+                            result_set.add(str(coefs_u))
+        result_file.write(str(result_set))
+        result_file.close()
+        return result

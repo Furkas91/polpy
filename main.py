@@ -2,8 +2,10 @@ from factors import Factors
 from polynom import Polynom, Poly
 
 def main():
-    p = Poly("x^4+3x-2")
-    p.berlekamp()
+    # p = Poly("x^4+3x-2")
+    # p.berlekamp()
+    p = Poly("x^2-3x+2")
+    p.kroneker()
     #s = Poly(str(input()))
     #Poly.z = 7
     #print(p.expand().derivative())
