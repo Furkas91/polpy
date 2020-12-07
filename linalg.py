@@ -79,7 +79,7 @@ def kernel(matrix, z=7):
     x = psevdodiv(1, b, z)
     monic_pol = (solution[0] * x) % z
 
-    return monic_pol
+    return monic_pol.astype(int)
 
 
 def ToReducedRowEchelonForm(M):
@@ -108,16 +108,6 @@ def ToReducedRowEchelonForm(M):
                 M[i] = (M[i] - M[r] * lv) % 7
         lead += 1
 
-
-mtx = np.asarray([[1, 1, 3, 3],
-                  [0, 2, 1, 6],
-                  [0, 0, 5, 1],
-                  [0, 2, 6, 0]])
-
-ToReducedRowEchelonForm(mtx)
-
-for rw in mtx:
-    print(', '.join((str(rv) for rv in rw)))
 
 # for i in range(7):
 #    for j in range(7):

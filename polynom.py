@@ -72,7 +72,7 @@ def to_hash(a):
 
 
 class Poly:
-    z = 7
+    z = 13
 
     def __init__(self, values):
         if isinstance(values, str):
@@ -293,13 +293,17 @@ class Poly:
 
     def berlekamp(self):
         from factors import Factors
+        self.ringz()
+        print(self)
         f = Factors([])
         m = []
         for i in range(self.deg()):
             h = Poly({i * self.z: 1})
+            # if i > 0:
+            #     h = h + Poly({i * self.z -1: 1})
             r = h % self
-            # print(f"{h}/{self}={r}")
-            # print(r.to_nparray(self.deg()))
+            print(f"{h}/{self}={r}")
+            print(r.to_nparray(self.deg()))
             m.append(r.to_nparray(self.deg()))
         Q = np.asarray(m).transpose()[::-1]
         for i in range(len(Q)):
@@ -308,23 +312,30 @@ class Poly:
         #                      [0, 1, 0, 0],
         #                      [0, 0, 1, 0],
         #                      [0, 0, 0, 1]])) % self.z
+        print(m)
+        print(Q)
 
         A = []
         for i in range(len(Q)):
-            print("A append: ", Q[i])
+            #print("A append: ", Q[i])
             A.append(Q[i] % self.z)
             A[i][i] -= 1
         A = np.asarray(A)
         # TODO: Add kernel function
-        a = la.get_solution(A)
+        print(A)
+        a = la.kernel(A)
+        #a = np.asarray([0, 0, 0, 1])
         # a = [1, 5, 3, 0]
         g = Poly(to_hash(a)).ringz()
         print(f"g = {g}")
         for i in range(self.z):
             d = self.gcdex(g - Poly({0: i}))[0]
-            print(f"d{i} = {d}")
-            if d.koefs != {0: 1}:
+            #d = d // d.koefs[d.deg()]
+
+            if d.deg() != 0:
+                d = d // Poly({0: d.koefs[d.deg()]})
                 f.multipliers.append((d, ""))
+            print(f"d{i} = {d}")
         print(f)
         return f
 
@@ -333,6 +344,7 @@ class Poly:
         g1 = f.multipliers[0][0]
         h1 = f.multipliers[1][0]
         for t in range(k - 1):
+            d = (f - g1*h1)
             # TODO: finish that function
             pass
 
