@@ -4,7 +4,7 @@ import itertools
 
 
 class Polynom:
-    z = 7
+    z = 0
 
     def __init__(self, values):
         if isinstance(values, str):
@@ -72,7 +72,7 @@ def to_hash(a):
 
 
 class Poly:
-    z = 7
+    z = 13
 
     def __init__(self, values):
         if isinstance(values, str):
@@ -354,23 +354,19 @@ class Poly:
         return np.unique(D)
 
     def kroneker(self):
-        result_file = open('result.txt', 'w')
-        result_set = set()
-        result = np.array([])
-        coefs = list(self.koefs)
-        print("coefs is: ", coefs)
+        result_set = []
+        coefs = list(self.koefs.values())
         p = np.poly1d(coefs)
         p0 = p(0)
-        flag = False
         for i in range((len(coefs) - 1) // 2):
             if p(i) == 0:
-                result_set.add(str(np.array([1, -i])))
+                result_set.append(np.array([1, -i]))
 
         if len(result_set) == 0:
             U = self.devisors(p0).copy()
             for i in range(1, (len(coefs) - 1) // 2 + 1):
                 M = self.devisors(p(i)).copy()
-                U1 = np.array([])
+                # U1 = np.array([])
                 if i == 1:
                     U = self.cartesian_product_itertools([U, M])
                 else:
@@ -385,7 +381,28 @@ class Poly:
                     for coefs_u in vars:
                         res = np.polydiv(coefs, coefs_u)[1][0]
                         if res == 0.0:
-                            result_set.add(str(coefs_u))
-        result_file.write(str(result_set))
-        result_file.close()
-        return result
+                            flag_el = True
+                            for el in result_set:
+                                if np.array_equal(el, coefs_u):
+                                    flag_el = False
+                                    break
+                            if flag_el:
+                                result_set.append(coefs_u)
+
+        result_list = []
+
+        mult_pol = np.array(list(itertools.combinations(result_set, len(coefs) - 1)))
+
+        from factors import Factors
+
+        for i in mult_pol:
+            f = Factors([])
+            pr = Poly(to_hash(i[0]))
+            for j in range(1, len(i)):
+                pr = pr * Poly(to_hash(i[j]))
+            if pr - self == 0:
+                for j in range(len(i)):
+                    pr = f.multipliers.append((Poly(to_hash(i[j])), ""))
+                result_list.append(str(f))
+
+        return result_list
