@@ -30,7 +30,80 @@ def check_ker_matrix(matrix, kernel, z):
 #     return monic_pol
 
 
-def kernel(matrix, z=7):
+# def kernel(matrix, z=13):
+#     # z = 7
+#     # matrix = np.asarray([[-1, -1, 2, 0],
+#     #                      [1, 4, 0, 0],
+#     #                      [-1, 1, 1, 0],
+#     #                      [-4, -4, 1, 0]])
+#
+#     matrix_t = matrix.transpose()
+#     # matrix_t = matrix
+#     u_matrix = np.eye(len(matrix_t))
+#     ker_matrix = np.concatenate((matrix_t, u_matrix), axis=1)
+#     ker_matrix = ker_matrix % z
+#     ind_row = 0
+#     print()
+#
+#     for col in range(len(matrix[0])):
+#         print('Step for {} column'.format(col))
+#         for row in range(ind_row, len(matrix)):
+#             # Pivoting
+#             if ker_matrix[row][col]:
+#                 ker_matrix[[ind_row, row]] = ker_matrix[[row, ind_row]]
+#                 break
+#
+#         b = ker_matrix[ind_row][col]
+#         print("b is ", b)
+#         x = psevdodiv(1, b, z)
+#         if x:
+#             ker_matrix = ker_matrix * x
+#         else:
+#             ker_matrix = ker_matrix * 1
+#         # print("x is ", x)
+#
+#         ker_matrix %= z
+#         print(ker_matrix)
+#
+#         for row in range(ind_row + 1, len(matrix)):
+#             # ax + b = 0 mod(z)
+#             # ax = -b mod(z)
+#             b = (-1) * ker_matrix[row][col]
+#
+#             # x = -b/a mod(z)
+#             x = psevdodiv(b % z, ker_matrix[ind_row][col], z)
+#
+#             # b = ax + b
+#             ker_matrix[row] += x * ker_matrix[ind_row]
+#
+#         # ker_matrix %= z
+#         print('Matrix after step\n {}'.format(ker_matrix))
+#         # print(ker_matrix)
+#         ind_row += 1
+#
+#     # print('__________________')
+#     # print('Final matrix')
+#     ker_matrix %= z
+#
+#     print("\nKernel matrix is\n", ker_matrix)
+#
+#     zero = ker_matrix[np.all(ker_matrix[:, :len(matrix)] == 0, axis=1)]
+#     kernel = zero[:, len(matrix):len(ker_matrix[0])]
+#     print(kernel)
+#     solution = kernel[kernel[:, len(matrix)-1] != 0]
+#     print(solution)
+#
+#     b = solution[0][len(matrix)-1]
+#     x = psevdodiv(1, b, z)
+#     solution[0] = np.flip(solution[0])
+#     print(solution[0])
+#     monic_pol = (solution[0] * x) % z
+#     print(solution[0])
+#
+#     return monic_pol.astype(int)
+
+
+def kernel(matrix, z=13):
     # z = 7
     # matrix = np.asarray([[-1, -1, 2, 0],
     #                      [1, 4, 0, 0],
@@ -38,46 +111,86 @@ def kernel(matrix, z=7):
     #                      [-4, -4, 1, 0]])
 
     matrix_t = matrix.transpose()
+    # matrix_t = matrix
     u_matrix = np.eye(len(matrix_t))
     ker_matrix = np.concatenate((matrix_t, u_matrix), axis=1)
     ker_matrix = ker_matrix % z
     ind_row = 0
+    print()
 
     for col in range(len(matrix[0])):
-        # print('Step for {} column'.format(col))
+        print('Step for {} column'.format(col))
+        #         first_element_idx = ind_row
+        #         if not ker_matrix[ind_row][col]:
         for row in range(ind_row, len(matrix)):
             # Pivoting
             if ker_matrix[row][col]:
+                #                 print(ker_matrix[row][col])
                 ker_matrix[[ind_row, row]] = ker_matrix[[row, ind_row]]
+                #                 print("Есть ненулевой элемент")
+                # есть ненулевой элемент в столбце
+                flag = True
                 break
+            else:
+                # только нулевые элементы в столбце
+                flag = False
 
-        for row in range(ind_row + 1, len(matrix)):
-            # ax + b = 0 mod(z)
-            # ax = -b mod(z)
-            b = (-1) * ker_matrix[row][col]
+        if flag:
+            #             ind_row -= 1
+            print("Есть ненулевой элемент")
+            b = ker_matrix[ind_row][col]
+            print("b is ", b)
+            x = psevdodiv(1, b, z)
+            if x:
+                ker_matrix[ind_row] = ker_matrix[ind_row] * x
+            else:
+                ker_matrix[ind_row] = ker_matrix[ind_row] * 1
+            # print("x is ", x)
 
-            # x = -b/a mod(z)
-            x = psevdodiv(b % z, ker_matrix[ind_row][col], z)
+            ker_matrix %= z
+            print(ker_matrix)
 
-            # b = ax + b
-            ker_matrix[row] += x * ker_matrix[ind_row]
+            for row in range(ind_row + 1, len(matrix)):
+                # ax + b = 0 mod(z)
+                # ax = -b mod(z)
+                b = (-1) * ker_matrix[row][col]
 
-        # ker_matrix %= z
-        # print('Matrix after {} step'.format(col))
-        # print(ker_matrix)
-        ind_row += 1
+                # x = -b/a mod(z)
+                x = psevdodiv(b % z, ker_matrix[ind_row][col], z)
+
+                # b = ax + b
+                ker_matrix[row] += x * ker_matrix[ind_row]
+
+            # ker_matrix %= z
+            print('Matrix after step\n {}'.format(ker_matrix))
+            # print(ker_matrix)
+            ind_row += 1
 
     # print('__________________')
     # print('Final matrix')
     ker_matrix %= z
-    # print(ker_matrix)
+
+    print("\nKernel matrix is\n", ker_matrix)
 
     zero = ker_matrix[np.all(ker_matrix[:, :len(matrix)] == 0, axis=1)]
     kernel = zero[:, len(matrix):len(ker_matrix[0])]
+    print(kernel)
+    # 2
+    # solution = kernel[kernel[:, len(matrix) - 1] != 0]
+    # 1
     solution = kernel[kernel[:, 0] != 0]
+    print(solution)
+
+    # 2
+    # b = solution[0][len(matrix) - 1]
+    # 1
     b = solution[0][0]
     x = psevdodiv(1, b, z)
+    # 2
+    # solution[0] = np.flip(solution[0])
+    print(solution[0])
     monic_pol = (solution[0] * x) % z
+    print(solution[0])
 
     return monic_pol.astype(int)
 

@@ -4,7 +4,7 @@ import itertools
 
 
 class Polynom:
-    z = 7
+    z = 13
 
     def __init__(self, values):
         if isinstance(values, str):
@@ -305,7 +305,12 @@ class Poly:
             print(f"{h}/{self}={r}")
             print(r.to_nparray(self.deg()))
             m.append(r.to_nparray(self.deg()))
+        # 1
         Q = np.asarray(m).transpose()[::-1]
+        # 2
+        # Q = np.asarray(m)
+        print("\nMatrix Q is \n", Q)
+        # 1
         for i in range(len(Q)):
             Q[i] = Q[i][::-1]
         # A = (Q - np.asarray([[1, 0, 0, 0],
@@ -313,17 +318,21 @@ class Poly:
         #                      [0, 0, 1, 0],
         #                      [0, 0, 0, 1]])) % self.z
         print(m)
-        print(Q)
+        # print("\nMatrix for kernel is \n", Q)
 
         A = []
+        print(A)
         for i in range(len(Q)):
             #print("A append: ", Q[i])
             A.append(Q[i] % self.z)
             A[i][i] -= 1
+
         A = np.asarray(A)
         # TODO: Add kernel function
-        print(A)
+        A = A % 13
+        print("\nMatrix A = Q-I is \n", A)
         a = la.kernel(A)
+        print("\nSolution is\n", a)
         #a = np.asarray([0, 0, 0, 1])
         # a = [1, 5, 3, 0]
         g = Poly(to_hash(a)).ringz()
