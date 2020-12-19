@@ -71,6 +71,18 @@ def to_hash(a):
     return h
 
 
+def fast_pow(x, y):
+    if y == 0:
+        return Poly({0:1})
+    if y == -1:
+        return Poly({0:1}) // x
+    p = fast_pow(x, y // 2)
+    p *= p
+    if y % 2:
+        p *= x
+    return p
+
+
 class Poly:
     z = 13
 
@@ -158,12 +170,16 @@ class Poly:
 
     def __mul__(self, other):
         h = {}
-        for i in self.koefs:
-            for j in other.koefs:
-                if h.get(i + j):
-                    h[i + j] += self.koefs[i] * other.koefs[j]
-                else:
-                    h[i + j] = self.koefs[i] * other.koefs[j]
+        if isinstance(other, Poly):
+            for i in self.koefs:
+                for j in other.koefs:
+                    if h.get(i + j):
+                        h[i + j] += self.koefs[i] * other.koefs[j]
+                    else:
+                        h[i + j] = self.koefs[i] * other.koefs[j]
+        if isinstance(other, int):
+            for i in self.koefs:
+                h[i + j] += self.koefs[i] * other
         return Poly(h).ringz()
 
     def __divmod__(self, other):
@@ -207,9 +223,24 @@ class Poly:
     def __mod__(self, other):
         return self.__divmod__(other)[1]
 
-    def __pow__(self):
-        # TODO: write an algorithm for exponentiation
-        pass
+    def __iadd__(self, other):
+        return self+other
+
+    def __imul__(self, other):
+        return self*other
+
+    def __imod__(self, other):
+        return self%other
+
+    def __isub__(self, other):
+        return self-other
+
+    def __ifloordiv__(self, other):
+        return self//other
+
+    def __pow__(self, degree):
+        return fast_pow(self, degree).ringz()
+
 
     def ringz(self):
         if self.z:
@@ -278,7 +309,8 @@ class Poly:
             else:
                 mon = tx
             print(f" mon = {mon}")
-            f.multipliers.append((mon, f"^{deg}"))
+            if deg != 1:
+                f.multipliers.append((mon, f"^{deg}"))
             p = gx
             print(deg)
             deg += 1
@@ -293,6 +325,7 @@ class Poly:
 
     def berlekamp(self):
         from factors import Factors
+        print(self)
         self.ringz()
         print(self)
         f = Factors([])
@@ -305,7 +338,6 @@ class Poly:
             print(f"{h}/{self}={r}")
             print(r.to_nparray(self.deg()))
             m.append(r.to_nparray(self.deg()))
-        # 1
         Q = np.asarray(m).transpose()[::-1]
         # 2
         # Q = np.asarray(m)
@@ -317,20 +349,19 @@ class Poly:
         #                      [0, 1, 0, 0],
         #                      [0, 0, 1, 0],
         #                      [0, 0, 0, 1]])) % self.z
-        print(m)
-        # print("\nMatrix for kernel is \n", Q)
+        # print(Q)
+        # print(m)
+        print("\nMatrix for kernel is \n", Q)
 
         A = []
-        print(A)
         for i in range(len(Q)):
             #print("A append: ", Q[i])
             A.append(Q[i] % self.z)
-            A[i][i] -= 1
+            A[i][i] = (A[i][i] - 1) % self.z
 
         A = np.asarray(A)
-        # TODO: Add kernel function
-        A = A % 13
-        print("\nMatrix A = Q-I is \n", A)
+        print("\nMatrix A = Q-E is \n", A)
+        print(A)
         a = la.kernel(A)
         print("\nSolution is\n", a)
         #a = np.asarray([0, 0, 0, 1])
