@@ -314,6 +314,7 @@ class Poly:
             p = gx
             print(deg)
             deg += 1
+        # print(f.multipliers[1][0])
         return f
 
     def to_nparray(self, n):
@@ -322,6 +323,79 @@ class Poly:
         for i in self.koefs:
             k[i] = self.koefs[i]
         return k
+
+    def berlekamp_first(self):
+        from factors import Factors
+
+        fac = Factors([])
+        sf = self.ringz().squarefree()
+        # f = []
+        for i in sf.multipliers:
+            if i[1] != '^1':
+                fac.multipliers.append((i[0], i[1]))
+                print(i)
+        print("Factor squared\n", fac)
+
+
+        self.ringz()
+        print(self)
+        f = Factors([])
+        m = []
+        for i in range(self.deg()):
+            h = Poly({i * self.z: 1})
+            # if i > 0:
+            #     h = h + Poly({i * self.z -1: 1})
+            r = h % self
+            print(f"{h}/{self}={r}")
+            print(r.to_nparray(self.deg()))
+            m.append(r.to_nparray(self.deg()))
+        # 1
+        Q = np.asarray(m).transpose()[::-1]
+        # 2
+        # Q = np.asarray(m)
+        print("\nMatrix Q is \n", Q)
+        # 1
+        for i in range(len(Q)):
+            Q[i] = Q[i][::-1]
+        # A = (Q - np.asarray([[1, 0, 0, 0],
+        #                      [0, 1, 0, 0],
+        #                      [0, 0, 1, 0],
+        #                      [0, 0, 0, 1]])) % self.z
+        print(m)
+        # print("\nMatrix for kernel is \n", Q)
+
+        A = []
+        print(A)
+        for i in range(len(Q)):
+            #print("A append: ", Q[i])
+            A.append(Q[i] % self.z)
+            A[i][i] -= 1
+
+        A = np.asarray(A)
+        # TODO: Add kernel function
+        A = A % 13
+        print("\nMatrix A = Q-I is \n", A)
+        a = la.kernel(A)
+        print("\nSolution is\n", a)
+        #a = np.asarray([0, 0, 0, 1])
+        # a = [1, 5, 3, 0]
+        g = Poly(to_hash(a)).ringz()
+        print(f"g = {g}")
+        for i in range(self.z):
+            d = self.gcdex(g - Poly({0: i}))[0]
+            #d = d // d.koefs[d.deg()]
+
+            if d.deg() != 0:
+                d = d // Poly({0: d.koefs[d.deg()]})
+                f.multipliers.append((d, ""))
+                # print(d)
+                break
+            print(f"d{i} = {d}")
+        print(d)
+        sub = self//d
+        f.multipliers.append((sub, ""))
+        print(f)
+        return f
 
     def berlekamp(self):
         from factors import Factors

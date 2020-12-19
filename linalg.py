@@ -147,8 +147,8 @@ def kernel(matrix, z=13):
                 ker_matrix[ind_row] = ker_matrix[ind_row] * 1
             # print("x is ", x)
 
-            ker_matrix %= z
-            print(ker_matrix)
+            # ker_matrix %= z
+            # print(ker_matrix)
 
             for row in range(ind_row + 1, len(matrix)):
                 # ax + b = 0 mod(z)

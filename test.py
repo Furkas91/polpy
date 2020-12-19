@@ -13,10 +13,19 @@ class TestPolynom(unittest.TestCase):
         # self.polynom = Poly("x^2+2x+1")
         # self.polynom = Poly("x^4+7x^3+8x^2+7x+1")
         # self.polynom = Poly("x^2+5x+6")
-        self.polynom = Poly("x^3+6x^2+11x+6")
-        # self.polynom = Poly("")
-        # self.polynom = Poly("")
-        self.otherpolynom = Poly("x^2+x+2")
+        # self.polynom = Poly("x^3+6x^2+11x+6")
+        self.polynom = Poly("8x^6+9x^5+2x^4+12x^3+x+12")
+        # self.polynom = Poly("8x^7+4x^6+11x^5+x^4+12x^3+x^2+12")
+        # self.polynom = Poly("x^4+6x^3+12x+4")
+        # self.polynom = Poly("9x^2+x+5")
+
+        # self.polynom = Poly("112x^4+58x^3-31x^2+107x-66")
+        # self.otherpolynom = Poly("x^2+2x+1")
+
+        # self.polynom = Poly("8x^6+9x^5+2x^4+12x^3+x+12")
+        # self.otherpolynom = Poly("x+1")
+
+        # self.polynom = Poly("11x^4+5x^3+11x^2+9x+10")
 
         # первая строка матрицы Q = (1, 0, 0, 0), deg = 4
         # изначальный полином x^4+4x^3+x^2+2x+8
@@ -69,11 +78,12 @@ class TestPolynom(unittest.TestCase):
         self.assertEqual(result, "5x+6")
 
     def test_berlekamp(self):
-        result = self.polynom.berlekamp().__str__()
+        result = self.polynom.berlekamp_first().__str__()
         print("The resut is ", result)
         # self.assertEqual(result, "(x-2)(x-2)")  # "(x^2+6x+2)(x^2+x+6)"
         # self.assertEqual(result, "(x^2+9x+9)(8x^2+12x+10)")
         self.assertEqual(result, "(x^2+9x+9)(x^2+8x+11)")
+
 
 if __name__ == "__main__":
     unittest.main()
