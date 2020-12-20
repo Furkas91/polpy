@@ -4,26 +4,42 @@ hash = {}
 
 
 def psevdodiv(a, b, z):
+    global hash
     if hash.get(z):
         if hash[z].get(a):
             if hash[z][a].get(b):
                 return hash[z][a][b]
             else:
+                if a % b != 0:
+                    for k in range(z):
+                        if a == b * k % z:
+                            hash[z][a][b] = k
+                            return k
+                else:
+                    k = a // b
+                    hash[z][a][b] = k
+                    return k
+
+        else:
+            if a % b != 0:
                 for k in range(z):
                     if a == b * k % z:
-                        hash[z][a][b] = k
+                        hash[z][a] = {b: k}
                         return k
-        else:
+            else:
+                k = a // b
+                hash[z][a] = {b: k}
+                return k
+    else:
+        if a % b != 0:
             for k in range(z):
                 if a == b * k % z:
-                    hash[z][a] = {b: k}
+                    hash[z] = {a: {b: k}}
                     return k
-    else:
-        for k in range(z):
-            if a == b * k % z:
-                hash[z] = {a: {b: k}}
-                return k
-
+        else:
+            k = a // b
+            hash[z] = {a: {b: k}}
+            return k
 
 def psevdodivarr(a, b, z):
     for i in a:
@@ -130,7 +146,7 @@ def kernel(matrix, z=13):
 
     matrix_t = matrix.transpose()
     # matrix_t = matrix
-    u_matrix = np.eye(len(matrix_t))
+    u_matrix = np.eye(len(matrix_t), dtype=int)
     ker_matrix = np.concatenate((matrix_t, u_matrix), axis=1)
     ker_matrix = ker_matrix % z
     ind_row = 0
@@ -158,7 +174,7 @@ def kernel(matrix, z=13):
             print("Есть ненулевой элемент")
             b = ker_matrix[ind_row][col]
             print("b is ", b)
-            x = psevdodiv(1, b, z)
+            x = psevdodiv(1, b%z, z)
             if x:
                 ker_matrix[ind_row] = ker_matrix[ind_row] * x
             else:
@@ -174,7 +190,7 @@ def kernel(matrix, z=13):
                 b = (-1) * ker_matrix[row][col]
 
                 # x = -b/a mod(z)
-                x = psevdodiv(b % z, ker_matrix[ind_row][col], z)
+                x = psevdodiv(b % z, ker_matrix[ind_row][col]%z, z)
 
                 # b = ax + b
                 ker_matrix[row] += x * ker_matrix[ind_row]
@@ -203,7 +219,7 @@ def kernel(matrix, z=13):
     # b = solution[0][len(matrix) - 1]
     # 1
     b = solution[0][0]
-    x = psevdodiv(1, b, z)
+    x = psevdodiv(1, b%z, z)
     # 2
     # solution[0] = np.flip(solution[0])
     print(solution[0])
