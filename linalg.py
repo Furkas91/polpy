@@ -200,6 +200,8 @@ def kernel(matrix, z=13):
             # print(ker_matrix)
             ind_row += 1
 
+        ker_matrix %= z
+
     # print('__________________')
     # print('Final matrix')
     ker_matrix %= z
