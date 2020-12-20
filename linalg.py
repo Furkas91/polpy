@@ -1,10 +1,28 @@
 import numpy as np
 
+hash = {}
+
 
 def psevdodiv(a, b, z):
-    for k in range(z):
-        if a == b * k % z:
-            return k
+    if hash.get(z):
+        if hash[z].get(a):
+            if hash[z][a].get(b):
+                return hash[z][a][b]
+            else:
+                for k in range(z):
+                    if a == b * k % z:
+                        hash[z][a][b] = k
+                        return k
+        else:
+            for k in range(z):
+                if a == b * k % z:
+                    hash[z][a] = {b: k}
+                    return k
+    else:
+        for k in range(z):
+            if a == b * k % z:
+                hash[z] = {a: {b: k}}
+                return k
 
 
 def psevdodivarr(a, b, z):
@@ -220,7 +238,6 @@ def ToReducedRowEchelonForm(M):
                 lv = M[i][lead]
                 M[i] = (M[i] - M[r] * lv) % 7
         lead += 1
-
 
 # for i in range(7):
 #    for j in range(7):

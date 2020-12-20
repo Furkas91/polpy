@@ -23,10 +23,10 @@ class Factors:
         return fts
 
     def __add__(self, other):
-        return self.expand()+other.expand()
+        return self.expand() + other.expand()
 
     def __sub__(self, other):
-        return self.expand()-other.expand()
+        return self.expand() - other.expand()
 
     def __mul__(self, other):
         # TODO: write a function that performs multiplication without opening parentheses
