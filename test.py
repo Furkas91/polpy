@@ -8,9 +8,11 @@ class TestPolynom(unittest.TestCase):
     def setUp(self):
         # self.polynom = Poly("x^3+x^2+x+5")
         # self.otherpolynom = Poly("x^2-2x-5")
-        self.polynom = Poly("112x^4+58x^3-31x^2+107x-66")
+        # self.polynom = Poly("112x^4+58x^3-31x^2+107x-66")
+        self.polynom = Poly("112x^40+58x^30-31x^20+107x-66")
         # self.polynom = Poly("x^4+1")
         # self.polynom = Poly("x^2+2x+1")
+        # self.polynom = Poly("x^3+6x^2+11x+6")
         # self.polynom = Poly("x^4+7x^3+8x^2+7x+1")
         # self.polynom = Poly("x^2+5x+6")
         # self.polynom = Poly("x^3+6x^2+11x+6")
