@@ -82,6 +82,15 @@ class TestPolynom(unittest.TestCase):
         # self.assertEqual(result, "(x^2+9x+9)(8x^2+12x+10)")
         self.assertEqual(result, "(x^2+9x+9)(x^2+8x+11)")
 
+    def test_divmod(self):
+        result = self.polynom.divmod(self.otherpolynom)
+        print("The resut is ", result[0])
+        print("mod is ", result[1])
+
+    def test_kroneker(self):
+        result = self.polynom.kroneker()
+        print("result is: ", result)
+
 
 if __name__ == "__main__":
     unittest.main()

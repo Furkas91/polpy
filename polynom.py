@@ -84,7 +84,7 @@ def fast_pow(x, y):
 
 
 class Poly:
-    z = 13
+    z = 0
 
     def __init__(self, values):
         if isinstance(values, str):
@@ -93,6 +93,8 @@ class Poly:
             values = values.replace("-x", "-1x")
             # print(values)
             mas = values.split('+')
+            if mas[0] == '':
+                mas.pop(0)
             # print(mas)
             self.koefs = {}
             for k in mas:
@@ -192,29 +194,32 @@ class Poly:
         r = Poly(self.koefs.copy())
         q = Poly({})
         if isinstance(other, Poly):
-            d = Poly(other.koefs.copy())
-            q = Poly({})
-            # main cycle division
-            while True:
-                # if r=0, then division finished with reminder = 0
-                if r == 0:
-                    break
-                # check degrees reminder's and divider's
-                kr = r.deg()
-                kd = d.deg()
-                i = kr - kd
-                if i < 0:
-                    break
-                # j = 1
-                # find suitable multiplier for this step
-                j = psevdodiv(r.koefs[kr], d.koefs[kd], Poly.z)
-                # creating monom from quotient
-                kq = Poly({i: j})
-                # print(kq)
-                # add monom to quotient
-                q += kq
-                # computing the reminder
-                r = r - d * kq
+            if Poly.z != 0:
+                d = Poly(other.koefs.copy())
+                q = Poly({})
+                # main cycle division
+                while True:
+                    # if r=0, then division finished with reminder = 0
+                    if r == 0:
+                        break
+                    # check degrees reminder's and divider's
+                    kr = r.deg()
+                    kd = d.deg()
+                    i = kr - kd
+                    if i < 0:
+                        break
+                    # j = 1
+                    # find suitable multiplier for this step
+                    j = psevdodiv(r.koefs[kr], d.koefs[kd], Poly.z)
+                    # creating monom from quotient
+                    kq = Poly({i: j})
+                    # print(kq)
+                    # add monom to quotient
+                    q += kq
+                    # computing the reminder
+                    r = r - d * kq
+            else:
+                q, r = self.divmod(other)
         if isinstance(other, int):
             if Poly.z == 0:
                 for i in r.koefs:
@@ -255,6 +260,11 @@ class Poly:
                 # print(self.koefs[i])
                 self.koefs[i] %= Poly.z
                 # print(f"= {self.koefs[i]} mod {Poly.z}")
+                if self.koefs[i] == 0:
+                    self.koefs.pop(i)
+        else:
+            cr = Poly(self.koefs.copy())
+            for i in cr.koefs:
                 if self.koefs[i] == 0:
                     self.koefs.pop(i)
         return self
@@ -303,21 +313,21 @@ class Poly:
         deg = 1
         while p.deg() != 0:
             g = p.derivative()
-            print(f" g = {g}")
+            # print(f" g = {g}")
             gx = p.gcd(g)
-            print(f" gx = {gx}")
+            # print(f" gx = {gx}")
             tx = p // gx
-            print(f" tx = {tx}")
+            # print(f" tx = {tx}")
             fx = gx.gcd(tx)
-            print(f" fx = {fx}")
+            # print(f" fx = {fx}")
             if fx.deg() > 0:
                 mon = tx // fx
             else:
                 mon = tx
-            print(f" mon = {mon}")
+            # print(f" mon = {mon}")
             f.multipliers.append((mon, f"^{deg}"))
             p = gx
-            print(deg)
+            # print(deg)
             deg += 1
         # print(f.multipliers[1][0])
         return f
@@ -504,55 +514,97 @@ class Poly:
         return np.unique(D)
 
     def kroneker(self):
-        result_set = []
-        coefs = list(self.koefs.values())
-        p = np.poly1d(coefs)
-        p0 = p(0)
-        for i in range((len(coefs) - 1) // 2):
-            if p(i) == 0:
-                result_set.append(np.array([1, -i]))
-
-        if len(result_set) == 0:
-            U = self.devisors(p0).copy()
-            for i in range(1, (len(coefs) - 1) // 2 + 1):
-                M = self.devisors(p(i)).copy()
-                # U1 = np.array([])
-                if i == 1:
-                    U = self.cartesian_product_itertools([U, M])
-                else:
-                    U1 = self.cartesian_product_itertools([U, M])
-                    U_new = np.array([np.append(U1[0][0], U1[0][1])])
-                    for u in range(1, len(U1)):
-                        new_u = np.array(np.append(U1[u][0], U1[u][1]))
-                        U_new = np.append(U_new, [new_u], axis=0)
-                    U = U_new.copy()
-                for u in U:
-                    vars = np.array(list(itertools.permutations(u)))
-                    for coefs_u in vars:
-                        res = np.polydiv(coefs, coefs_u)[1][0]
-                        if res == 0.0:
-                            flag_el = True
-                            for el in result_set:
-                                if np.array_equal(el, coefs_u):
-                                    flag_el = False
-                                    break
-                            if flag_el:
-                                result_set.append(coefs_u)
-
-        result_list = []
-
-        mult_pol = np.array(list(itertools.combinations(result_set, len(coefs) - 1)))
-
         from factors import Factors
 
-        for i in mult_pol:
-            f = Factors([])
-            pr = Poly(to_hash(i[0]))
-            for j in range(1, len(i)):
-                pr = pr * Poly(to_hash(i[j]))
-            if pr - self == 0:
-                for j in range(len(i)):
-                    pr = f.multipliers.append((Poly(to_hash(i[j])), ""))
-                result_list.append(str(f))
+        result_set = []
+        coefs = list(self.koefs.values())
+
+        f = Factors([])
+        sf = self.ringz().squarefree()
+        count = 0
+        # f = []
+        # print("aaaaaaaaaaaaaaaaaaaaaaaaa", sf)
+        for i in sf.multipliers:
+            if i[1] != '^1':
+                f.multipliers.append((i[0], i[1]))
+                print(i)
+            else:
+                count += 1
+        # print("Factor squared\n", f)
+
+        if count:
+            p = np.poly1d(coefs)
+            p0 = p(0)
+            for i in range((len(coefs) - 1) // 2):
+                if p(i) == 0:
+                    result_set.append(np.array([1, -i]))
+
+            if len(result_set) == 0:
+                U = self.devisors(p0).copy()
+                for i in range(1, (len(coefs) - 1) // 2 + 1):
+                    M = self.devisors(p(i)).copy()
+                    # U1 = np.array([])
+                    if i == 1:
+                        U = self.cartesian_product_itertools([U, M])
+                    else:
+                        U1 = self.cartesian_product_itertools([U, M])
+                        U_new = np.array([np.append(U1[0][0], U1[0][1])])
+                        for u in range(1, len(U1)):
+                            new_u = np.array(np.append(U1[u][0], U1[u][1]))
+                            U_new = np.append(U_new, [new_u], axis=0)
+                        U = U_new.copy()
+                    for u in U:
+                        vars = np.array(list(itertools.permutations(u)))
+                        for coefs_u in vars:
+                            res = np.polydiv(coefs, coefs_u)[1][0]
+                            if res == 0.0:
+                                flag_el = True
+                                for el in result_set:
+                                    if np.array_equal(el, coefs_u):
+                                        flag_el = False
+                                        break
+                                if flag_el:
+                                    result_set.append(coefs_u)
+
+            result_list = []
+
+            mult_pol = np.array(list(itertools.combinations(result_set, len(coefs) - 1)))
+
+            from factors import Factors
+
+            for i in mult_pol:
+                f = Factors([])
+                pr = Poly(to_hash(i[0]))
+                for j in range(1, len(i)):
+                    pr = pr * Poly(to_hash(i[j]))
+                if pr - self == 0:
+                    for j in range(len(i)):
+                        pr = f.multipliers.append((Poly(to_hash(i[j])), ""))
+                    result_list.append(str(f))
 
         return result_list
+
+    def divmod(self, other):
+        divisible = Poly(self.koefs.copy())
+        divider = Poly(other.koefs.copy())
+        # print(divisible, divider, self.z)
+        result = Poly([0])
+        while divisible.deg() >= divider.deg():
+            deg1 = divisible.deg()
+            deg2 = divider.deg()
+            coef = int(divisible.koefs[deg1] / divider.koefs[deg2])
+            degree = deg1 - deg2
+            # print("coe, deg ", list(divisible.koefs.values()), list(divider.koefs.values()), \
+            #       divisible.deg(), divider.deg())
+            # print("c, d ", coef, degree)
+            deductible = Poly(str(coef))
+            if degree > 1:
+                deductible = Poly(str(coef) + "x^" + str(degree))
+            elif degree == 1:
+                deductible = Poly(str(coef) + "x")
+            # print("r, d ", result, deductible)
+            result = result + deductible
+            divisible = divisible - deductible*divider
+            # print("ddd ", divisible, deductible, divider)
+        modul = Poly(self.koefs.copy()) - result*divider
+        return result, modul
