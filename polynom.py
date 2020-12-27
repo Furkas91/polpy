@@ -84,7 +84,7 @@ def fast_pow(x, y):
 
 
 class Poly:
-    z = 0
+    z = 13
 
     def __init__(self, values):
 
@@ -305,6 +305,9 @@ class Poly:
             if i > 0:
                 h[i - 1] = self.koefs[i] * i
         return Poly(h).ringz()
+    def is_freesqusquared(self):
+        # TODO write check a polynomial is free of squares
+        return True
 
     def squarefree(self):
         # TODO: write to basic square free algorithm
@@ -314,21 +317,23 @@ class Poly:
         deg = 1
         while p.deg() != 0:
             g = p.derivative()
-            # print(f" g = {g}")
+            if g == Poly({0:0}):
+                break
+            print(f" g = {g}")
             gx = p.gcd(g)
-            # print(f" gx = {gx}")
+            print(f" gx = {gx}")
             tx = p // gx
-            # print(f" tx = {tx}")
+            print(f" tx = {tx}")
             fx = gx.gcd(tx)
-            # print(f" fx = {fx}")
+            print(f" fx = {fx}")
             if fx.deg() > 0:
                 mon = tx // fx
             else:
                 mon = tx
-            # print(f" mon = {mon}")
+            print(f" mon = {mon}")
             f.multipliers.append((mon, f"^{deg}"))
             p = gx
-            # print(deg)
+            print(deg)
             deg += 1
         # print(f.multipliers[1][0])
         return f
@@ -395,6 +400,7 @@ class Poly:
             # a = [1, 5, 3, 0]
             g = Poly(to_hash(a)).ringz()
             print(f"g = {g}")
+            f = Factors([])
             for i in range(Poly.z):
                 d = self.gcdex(g - Poly({0: i}))[0]
                 # d = d // d.koefs[d.deg()]
@@ -484,7 +490,7 @@ class Poly:
             print(f"d = {d}")
             print(f"({a})({g})+({b})({h}) = {a * g + b * h} = ({e})")
             if e.deg == 0:
-                return "berlekamp zalupa"
+                return "множители приводимы"
             # a *= d
             sq, a = (a * d).__divmod__(h)
             # b *= d
