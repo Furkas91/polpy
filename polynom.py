@@ -63,6 +63,41 @@ class Polynom:
         return Polynom(mul)
 
 
+def SieveEratosthenes(n):
+    a = [i for i in range(n + 1)]
+    a[0] = 0
+    lst = []
+
+    i = 2
+    while i <= n:
+        if a[i] != 0:
+            lst.append(a[i])
+        for j in range(i, n + 1, i):
+            a[j] = 0
+        i += 1
+    return lst
+
+def getmuls(n):
+    import itertools
+    Ans = []
+    muls = set()
+    d = 2
+    while d * d <= n:
+        if n % d == 0:
+            Ans.append(d)
+            n //= d
+        else:
+            d += 1
+    if n > 1:
+        Ans.append(n)
+    listm = list(itertools.permutations(Ans))
+    for i in listm:
+        q=1
+        for j in i:
+            q*=j
+            muls.add(q)
+    return np.asarray(list(muls))
+
 def to_hash(a):
     h = {}
     for i in range(len(a)):
@@ -253,6 +288,9 @@ class Poly:
     def __pow__(self, degree):
         return fast_pow(self, degree).ringz()
 
+    def copy(self):
+        return Poly(self.koefs)
+
     def ringz(self):
         if Poly.z:
             cr = Poly(self.koefs.copy())
@@ -304,6 +342,15 @@ class Poly:
             if i > 0:
                 h[i - 1] = self.koefs[i] * i
         return Poly(h).ringz()
+
+    def maxabskoef(self):
+        max = 0
+        for i in self.koefs:
+            q = abs(self.koefs[i])
+            if q > max:
+                max = q
+        return max
+
     def is_freesqusquared(self):
         # TODO write check a polynomial is free of squares
         return True
@@ -316,7 +363,7 @@ class Poly:
         deg = 1
         while p.deg() != 0:
             g = p.derivative()
-            if g == Poly({0:0}):
+            if g == Poly({0: 0}):
                 break
             print(f" g = {g}")
             gx = p.gcd(g)
@@ -502,6 +549,49 @@ class Poly:
         print(f"({g})({h})-{self} = {g * h - self}")
         return Factors([(g, "^1"), (h, "^1")])
 
+    def enumeration(self, other):
+        g = self.copy()
+        h = other.copy()
+        ag = g.koefs[g.deg()]
+        ah = h.koefs[h.deg()]
+        g = g // ag
+        h = h // ah
+
+        muls = getmuls(ag*ah)
+        muls = muls[muls < Poly.z]
+
+        list = []
+        for mul in muls:
+            list.append((g*mul, h*(ag*ah/mul)))
+        # TODO придумать как перебрать все знаки и добавить в список
+
+    def factorize(self):
+        from factors import Factors
+        Poly.z = 0
+        max = self.maxabskoef()
+        primes = SieveEratosthenes(10000)
+        for prime in primes:
+            polyz = self.copy()
+            if polyz.koefs[polyz.deg()] % prime == 0:
+                continue
+            Poly.z = prime
+            polyz.ringz()
+            if not polyz.is_freesqusquared():
+                continue
+            i = 1
+            while prime ** i < max:
+                i += 1
+            f = polyz.henzel_lifting(i)
+            break
+        g = f.multipliers[0][0]
+        h = f.multipliers[1][0]
+        list = g.enumeration(h)
+        Poly.z = 0
+        for muls in list:
+            if muls[0]*muls[1] - self == 0:
+                return Factors([(muls[0], "^1"), (muls[1], "^1")])
+        return "печаль беда"
+
     def cartesian_product_itertools(self, arrays):
         return np.array(list(itertools.product(*arrays)))
 
@@ -610,7 +700,7 @@ class Poly:
                 deductible = Poly(str(coef) + "x")
             # print("r, d ", result, deductible)
             result = result + deductible
-            divisible = divisible - deductible*divider
+            divisible = divisible - deductible * divider
             # print("ddd ", divisible, deductible, divider)
-        modul = Poly(self.koefs.copy()) - result*divider
+        modul = Poly(self.koefs.copy()) - result * divider
         return result, modul
