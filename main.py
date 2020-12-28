@@ -3,11 +3,18 @@ from polynom import Polynom, Poly
 
 
 def main():
-    Poly.z = 7
-    p = Poly("x^2+x+1")
-
-    # f = p.berlekamp()
-    print(p ** 10000)
+    Poly.z = 0
+    p = Poly("112x^4+58x^3-31x^2+107x-66")
+    print(p.factorize())
+    #p = Poly("x^2+9x+9")
+    #d = Poly("8x^2+12x+10")
+    #h = Poly("2x^2+5x+5")
+#
+    ## f = p.berlekamp()
+    #for i in p.enumeration(d):
+    #    print(i[0], i[1])
+    #for i in h.naturaltoint():
+    #    print(i)
     # s = Poly(str(input()))
     # Poly.z = 7
     # print(p.expand().derivative())

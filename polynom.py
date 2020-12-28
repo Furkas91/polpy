@@ -221,6 +221,7 @@ class Poly:
                     h[i] += self.koefs[i] * other
                 else:
                     h[i] = self.koefs[i] * other
+                    print(h[i])
         return Poly(h).ringz()
 
     def __divmod__(self, other):
@@ -290,7 +291,7 @@ class Poly:
         return fast_pow(self, degree).ringz()
 
     def copy(self):
-        return Poly(self.koefs)
+        return Poly(self.koefs.copy())
 
     def ringz(self):
         if Poly.z:
@@ -550,20 +551,59 @@ class Poly:
         print(f"({g})({h})-{self} = {g * h - self}")
         return Factors([(g, "^1"), (h, "^1")])
 
+    def naturaltoint(self):
+        z = Poly.z
+        Poly.z = 0
+        nums = len(self.koefs)
+        slist = []
+        ans = []
+        for i in range(nums):
+            l = [True]*i+[False]*(nums-i)
+            slist.append(l)
+        for lst in slist:
+            listm = list(itertools.permutations(lst))
+            for lm in listm:
+                j=0
+                p = self.copy()
+                for i in self.koefs:
+                    if lm[j]:
+                        p.koefs[i] = self.koefs[i]-z
+                    j += 1
+                ans.append(p)
+        return ans
+
     def enumeration(self, other):
+        z = Poly.z
         g = self.copy()
         h = other.copy()
+        print(g, h)
         ag = g.koefs[g.deg()]
         ah = h.koefs[h.deg()]
-        g = g // ag
-        h = h // ah
-
+        #print(f"{g} / {ag} = {g//ag}")
+        g = g // Poly(str(ag))
+        h = h // Poly(str(ah))
+        print(g, h)
         muls = getmuls(ag*ah)
         muls = muls[muls < Poly.z]
-
+        print(muls)
         list = []
         for mul in muls:
-            list.append((g*mul, h*(ag*ah/mul)))
+            #print(ag*ah//mul)
+            list.append((g*int(mul), h*(int(ag*ah//mul))))
+
+        ans = []
+        for lst in list:
+            #print(lst[0], lst[1])
+            Poly.z = z
+            g = lst[0].naturaltoint()
+            Poly.z = z
+            h = lst[1].naturaltoint()
+            #for j in g:
+            #    print(j)
+            for i in h:
+                for j in g:
+                    ans.append((i,j))
+        return ans
         # TODO придумать как перебрать все знаки и добавить в список
 
     def factorize(self):
@@ -577,21 +617,26 @@ class Poly:
                 continue
             Poly.z = prime
             polyz.ringz()
-            if not polyz.is_freesqusquared():
+            #if not polyz.is_freesqusquared():
+            if prime < 13:
                 continue
             i = 1
             while prime ** i < max:
                 i += 1
-            f = polyz.henzel_lifting(i)
+            f = self.henzel_lifting(i)
+            #print(f"f = {f} "
+            #      f"polyz = {polyz}  "
+            #      f"z = {Poly.z}")
             break
         g = f.multipliers[0][0]
         h = f.multipliers[1][0]
         list = g.enumeration(h)
         Poly.z = 0
         for muls in list:
+            #print(f"({muls[0]})*({muls[1]})={self}")
             if muls[0]*muls[1] - self == 0:
                 return Factors([(muls[0], "^1"), (muls[1], "^1")])
-        return "печаль беда"
+        return "Многочлен не приводим"
 
     def cartesian_product_itertools(self, arrays):
         return np.array(list(itertools.product(*arrays)))
