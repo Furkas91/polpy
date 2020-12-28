@@ -122,6 +122,7 @@ class Poly:
     z = 13
 
     def __init__(self, values):
+
         if isinstance(values, str):
             values = values.replace(' ', '')
             values = values.replace('-', "+-")
